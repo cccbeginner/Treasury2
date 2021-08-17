@@ -116,7 +116,37 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
         }
         idMap.remove(id)
     }
-
+    fun updateId(preId: Int, curId: Int){
+        assert(idMap[preId] != null)
+        assert(idMap[curId] == null)
+        idMap[preId]!!.id = curId
+        idMap[curId] = idMap[preId]!!
+        idMap.remove(preId)
+        val theForm = idMap[curId]!!
+        for (form in childrenMap[theForm.parentId]!!) {
+            if (form.id == preId)form.id = curId
+        }
+        if (childrenMap[preId] != null) {
+            for (form in childrenMap[preId]!!) {
+                form.parentId = curId
+                idMap[form.id]!!.parentId = curId
+            }
+            childrenMap[curId] = childrenMap[preId]!!
+            childrenMap.remove(preId)
+        }
+    }
+    fun clearContent(){
+        for (kv in idMap){
+            kv.value.note = ""
+            kv.value.value = ""
+        }
+        for (kv in childrenMap){
+            for (form in kv.value){
+                form.note = ""
+                form.value = ""
+            }
+        }
+    }
     fun exportData(): ArrayList<Form>{
         val ret = ArrayList<Form>()
         for (kv in idMap){

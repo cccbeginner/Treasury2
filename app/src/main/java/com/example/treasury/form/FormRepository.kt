@@ -13,6 +13,7 @@ class FormRepository (private val formDao: FormDao) {
      * mutable map <form array>
      */
     val formListFlow = MutableStateFlow<Array<Form>>(arrayOf())
+    val formListFlowExtra = MutableStateFlow<Array<Form>>(arrayOf())
     private var idMax = -1
 
     init {
@@ -24,6 +25,10 @@ class FormRepository (private val formDao: FormDao) {
     suspend fun fetchData(yearMonth: Int){
         val formArr = formDao.getByYearMonth(yearMonth)
         formListFlow.emit(formArr)
+    }
+    suspend fun fetchDataExtra(yearMonth: Int){
+        val formArr = formDao.getByYearMonth(yearMonth)
+        formListFlowExtra.emit(formArr)
     }
 
     suspend fun insertMany(formArrayList: ArrayList<Form>){

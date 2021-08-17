@@ -13,7 +13,7 @@ data class Form(
     @ColumnInfo(name = "_id")
     var id: Int,
     @ColumnInfo(name = "parent_id")
-    val parentId: Int,
+    var parentId: Int,
     @ColumnInfo(name = "year_month")
     val yearMonth: Int,
     var name: String,

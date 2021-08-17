@@ -11,18 +11,37 @@ class EditViewModel(
     private val currentYearMonth : Int
 ) : ViewModel() {
     private var originalData : LiveData<Array<Form>> = formRepository.formListFlow.asLiveData()
+    private var preMonthData : LiveData<Array<Form>> = formRepository.formListFlowExtra.asLiveData()
     private var formArrayParser = FormArrayParser(arrayListOf())
     var currentData = MutableLiveData<ArrayList<Form>>()
+    private var alreadyHaveData = false
+    private var alreadyMakeUpData = false
 
     init {
         fetchData()
+        preMonthData.observeForever{
+            if (!alreadyHaveData && it.isNotEmpty()){
+                alreadyMakeUpData = true
+                val formData = it.toCollection(ArrayList())
+                val tmpParser = FormArrayParser(formData)
+                for (form in formData){
+                    tmpParser.updateId(form.id, assignId())
+                }
+                tmpParser.clearContent()
+                currentData.postValue(tmpParser.exportData())
+            }
+        }
         originalData.observeForever {
             var formArray = originalData.value!!.toCollection(ArrayList())
-            if (formArray.isEmpty()) {
+            if (!alreadyHaveData && formArray.isNotEmpty()){
+                alreadyHaveData = true
+                currentData.postValue(formArray)
+                formArrayParser = FormArrayParser(formArray)
+            }else if (!alreadyHaveData && !alreadyMakeUpData && formArray.isEmpty()){
                 formArray = initFormArray()
+                currentData.postValue(formArray)
+                formArrayParser = FormArrayParser(formArray)
             }
-            currentData.postValue(formArray)
-            formArrayParser = FormArrayParser(formArray)
         }
     }
 
@@ -74,6 +93,7 @@ class EditViewModel(
     private fun fetchData(){
         viewModelScope.launch {
             formRepository.fetchData(currentYearMonth)
+            formRepository.fetchDataExtra(currentYearMonth-1)
         }
     }
 }
