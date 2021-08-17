@@ -88,6 +88,7 @@ class EditViewModel(
         viewModelScope.launch {
             formRepository.deleteByCurrentYearMonth(currentYearMonth)
             formRepository.insertMany(formArrayParser.exportData())
+            formRepository.fetchData(currentYearMonth)
         }
     }
     private fun fetchData(){
