@@ -84,7 +84,10 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.currentDate.observe(this, {
             val rootLayout = findViewById<LinearLayout>(R.id.date)
             rootLayout.removeAllViews()
-            rootLayout.addView(dateShow(it, rootLayout))
+            if(it.year != "" || it.month != "" || it.day != "") {
+                rootLayout.setPadding(100, 10, 0, 0)
+                rootLayout.addView(dateShow(it, rootLayout))
+            }
         })
 
         // button to go to edit page

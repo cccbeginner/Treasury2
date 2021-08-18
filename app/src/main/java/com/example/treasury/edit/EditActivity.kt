@@ -54,6 +54,7 @@ class EditActivity : AppCompatActivity() {
         editViewModel.currentDate.observe(this, {
             val rootLayout = findViewById<LinearLayout>(R.id.date)
             rootLayout.removeAllViews()
+            rootLayout.setPadding(100, 10, 0, 0)
             rootLayout.addView(dateEdit(it, rootLayout))
         })
 
