@@ -43,6 +43,13 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="vertical"/>
+
+        <LinearLayout
             android:id="@+id/page"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -15,5 +15,5 @@ interface FormDao {
     suspend fun deleteByYearMonth(yearMonth: Int)
 
     @Query("SELECT MAX(_id) from tbl_form")
-    suspend fun getMaxId(): Int
+    suspend fun getMaxId(): Int?
 }

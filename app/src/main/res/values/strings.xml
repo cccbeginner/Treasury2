@@ -8,6 +8,11 @@
     <string name="cancel">取消</string>
     <string name="add">＋新增項目</string>
     <string name="update_name">修改名稱</string>
+    <string name="l">/</string>
+    <string name="date">日期：</string>
+    <string name="day">日</string>
+    <string name="year_AD">西元年</string>
+    <string name="usd_ex_rate">美金匯率：</string>
 
     <string-array name="month_array">
         <item>1</item>

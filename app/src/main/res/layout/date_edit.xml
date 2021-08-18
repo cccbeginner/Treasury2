@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <TextView
+        android:textSize="22sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/date"/>
+    <EditText
+        android:id="@+id/year_edit"
+        android:textSize="22sp"
+        android:inputType="number"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/year_AD"/>
+    <TextView
+        android:textSize="22sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/l"/>
+    <EditText
+        android:id="@+id/month_edit"
+        android:textSize="22sp"
+        android:inputType="number"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/month"/>
+    <TextView
+        android:textSize="22sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/l"/>
+    <EditText
+        android:id="@+id/day_edit"
+        android:textSize="22sp"
+        android:inputType="number"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:hint="@string/day"/>
+
+</LinearLayout>

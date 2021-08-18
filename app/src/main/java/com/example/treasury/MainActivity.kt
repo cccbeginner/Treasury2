@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
+import com.example.treasury.date.Date
 import com.example.treasury.edit.EditActivity
 import com.example.treasury.form.Form
 import com.example.treasury.form.FormArrayParser
@@ -23,7 +24,8 @@ class MainActivity : AppCompatActivity() {
 
         // viewModel
         val formRepository = (application as MyApplication).formRepository
-        val mainViewModel = ViewModelProvider(this, MainViewModelFactory(formRepository))
+        val dateRepository = (application as MyApplication).dateRepository
+        val mainViewModel = ViewModelProvider(this, MainViewModelFactory(formRepository, dateRepository))
             .get(MainViewModel::class.java)
 
         // current yearMonth
@@ -78,6 +80,12 @@ class MainActivity : AppCompatActivity() {
             renderForm(-1, rootLayout)
         })
 
+        // set observer for current data
+        mainViewModel.currentDate.observe(this, {
+            val rootLayout = findViewById<LinearLayout>(R.id.date)
+            rootLayout.removeAllViews()
+            rootLayout.addView(dateShow(it, rootLayout))
+        })
 
         // button to go to edit page
         val goEdit = findViewById<Button>(R.id.go_edit_button)
@@ -92,13 +100,8 @@ class MainActivity : AppCompatActivity() {
     private fun renderForm(formId: Int, currentLayout: LinearLayout){
         val theForm = formArrayParser.getTheForm(formId)
         theForm?.let {
-            if (theForm.note.replace("\\s+".toRegex(), "") != "") {
-                val formView = formShowNote(it, currentLayout)
-                currentLayout.addView(formView)
-            }else{
-                val formView = formShow(it, currentLayout)
-                currentLayout.addView(formView)
-            }
+            val formView = formShow(it, currentLayout)
+            currentLayout.addView(formView)
         }
 
         val childrenArray = formArrayParser.getChildren(formId)
@@ -122,19 +125,33 @@ class MainActivity : AppCompatActivity() {
             .text = "${form.name}："
         formView.findViewById<TextView>(R.id.number_show)
             .text = form.value
+        if(form.type == Form.type_USD){
+            formView.findViewById<TextView>(R.id.usd_number_show)
+                .text = form.weight
+        }else{
+            formView.findViewById<LinearLayout>(R.id.usd)
+                .visibility = View.GONE
+        }
+        if (form.note != ""){
+            formView.findViewById<TextView>(R.id.note_show)
+                .text = form.note
+        }else{
+            formView.findViewById<LinearLayout>(R.id.note)
+                .visibility = View.GONE
+        }
         return formView
     }
 
-    private fun formShowNote(form: Form, root: ViewGroup?): View{
-        val formView = LayoutInflater
+    private fun dateShow(date: Date, root: ViewGroup?): View{
+        val dateView = LayoutInflater
             .from(this)
-            .inflate(R.layout.form_item_show_note, root, false)
-        formView.findViewById<TextView>(R.id.title_show)
-            .text = "${form.name}："
-        formView.findViewById<TextView>(R.id.number_show)
-            .text = form.value
-        formView.findViewById<TextView>(R.id.note_show)
-            .text = form.note
-        return formView
+            .inflate(R.layout.date_show, root, false)
+        dateView.findViewById<TextView>(R.id.year_show)
+            .text = date.year
+        dateView.findViewById<TextView>(R.id.month_show)
+            .text = date.month
+        dateView.findViewById<TextView>(R.id.day_show)
+            .text = date.day
+        return dateView
     }
 }

@@ -1,6 +1,8 @@
 package com.example.treasury.edit
 
 import androidx.lifecycle.*
+import com.example.treasury.date.Date
+import com.example.treasury.date.DateRepository
 import com.example.treasury.form.FormArrayParser
 import com.example.treasury.form.Form
 import com.example.treasury.form.FormRepository
@@ -8,12 +10,15 @@ import kotlinx.coroutines.launch
 
 class EditViewModel(
     private val formRepository: FormRepository,
+    private val dateRepository: DateRepository,
     private val currentYearMonth : Int
 ) : ViewModel() {
     private var originalData : LiveData<Array<Form>> = formRepository.formListFlow.asLiveData()
     private var preMonthData : LiveData<Array<Form>> = formRepository.formListFlowExtra.asLiveData()
     private var formArrayParser = FormArrayParser(arrayListOf())
+    var originalDate : LiveData<Date> = dateRepository.dateFlow.asLiveData()
     var currentData = MutableLiveData<ArrayList<Form>>()
+    var currentDate = MutableLiveData<Date>()
     private var alreadyHaveData = false
     private var alreadyMakeUpData = false
 
@@ -43,21 +48,40 @@ class EditViewModel(
                 formArrayParser = FormArrayParser(formArray)
             }
         }
+        originalDate.observeForever{
+            currentDate.postValue(it)
+        }
+    }
+
+    fun updateDateYear(year: String){
+        val newDate = currentDate.value!!
+        newDate.year = year
+        currentDate.postValue(newDate)
+    }
+    fun updateDateMonth(month: String){
+        val newDate = currentDate.value!!
+        newDate.month = month
+        currentDate.postValue(newDate)
+    }
+    fun updateDateDay(day: String){
+        val newDate = currentDate.value!!
+        newDate.day = day
+        currentDate.postValue(newDate)
     }
 
     private fun initFormArray(): ArrayList<Form>{
         val ret = ArrayList<Form>()
-        ret.add(Form(assignId(), -1, currentYearMonth, "一、流動現金", "", ""))
-        ret.add(Form(assignId(), -1, currentYearMonth, "二、投資帳現值", "", ""))
-        ret.add(Form(assignId(), -1, currentYearMonth, "三、貸款餘額", "", ""))
-        ret.add(Form(assignId(), -1, currentYearMonth, "四、扣除", "", ""))
-        ret.add(Form(assignId(), -1, currentYearMonth, "五、美股", "", ""))
-        ret.add(Form(assignId(), ret[0].id, currentYearMonth, "a. 活存", "", ""))
-        ret.add(Form(assignId(), ret[0].id, currentYearMonth, "b. 現金", "", ""))
-        ret.add(Form(assignId(), ret[0].id, currentYearMonth, "c. 外幣", "", ""))
-        ret.add(Form(assignId(), ret[1].id, currentYearMonth, "a. 證券", "", ""))
-        ret.add(Form(assignId(), ret[1].id, currentYearMonth, "b. 基金", "", ""))
-        ret.add(Form(assignId(), ret[1].id, currentYearMonth, "c. 黃金", "", ""))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "一、流動現金"))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "二、投資帳現值"))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "三、貸款餘額"))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "四、扣除"))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_USD, "五、美股"))
+        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_normal, "a. 活存"))
+        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_normal, "b. 現金"))
+        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_USD, "c. 外幣"))
+        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "a. 證券"))
+        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "b. 基金"))
+        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "c. 黃金"))
         return ret
     }
 
@@ -74,8 +98,13 @@ class EditViewModel(
         formArrayParser.updateValue(id, value)
         currentData.postValue(formArrayParser.exportData())
     }
+    fun updateFormWeight(id: Int, weight: String){
+        formArrayParser.updateWeight(id, weight)
+        currentData.postValue(formArrayParser.exportData())
+    }
     fun updateFormName(id: Int, name: String){
         formArrayParser.updateName(id, name)
+        currentData.postValue(formArrayParser.exportData())
     }
     fun updateFormNote(id: Int, note: String){
         formArrayParser.updateNote(id, note)
@@ -89,6 +118,8 @@ class EditViewModel(
             formRepository.deleteByCurrentYearMonth(currentYearMonth)
             formRepository.insertMany(formArrayParser.exportData())
             formRepository.fetchData(currentYearMonth)
+            dateRepository.insert(currentDate.value!!)
+            dateRepository.fetchData(currentYearMonth)
         }
     }
     private fun fetchData(){
@@ -101,9 +132,10 @@ class EditViewModel(
 
 class EditViewModelFactory(
     private val formRepository: FormRepository,
+    private val dateRepository: DateRepository,
     private val currentYearMonth : Int
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return EditViewModel(formRepository, currentYearMonth) as T
+        return EditViewModel(formRepository, dateRepository, currentYearMonth) as T
     }
 }
