@@ -42,13 +42,14 @@ class EditActivity : AppCompatActivity() {
 
         editViewModel.currentData.observe(this, {
             formArrayParser = FormArrayParser(it)
-            println("observe current Data")
-            for(form in it){
-                println(form)
+            val pageLayout = findViewById<LinearLayout>(R.id.page)
+            val totalLayout = findViewById<LinearLayout>(R.id.total)
+            pageLayout.removeAllViews()
+            totalLayout.removeAllViews()
+            renderForm(-1, pageLayout)
+            if (it.isNotEmpty()) {
+                totalLayout.addView(totalShow(totalLayout))
             }
-            val rootLayout = findViewById<LinearLayout>(R.id.page)
-            rootLayout.removeAllViews()
-            renderForm(-1, rootLayout)
         })
 
         editViewModel.currentDate.observe(this, {
@@ -242,6 +243,18 @@ class EditActivity : AppCompatActivity() {
             cursorFormId = -1
         }
         return dateView
+    }
+
+    private fun totalShow(root: ViewGroup?): View{
+        val totalView = LayoutInflater
+            .from(this)
+            .inflate(R.layout.total_show, root, false)
+        totalView.findViewById<TextView>(R.id.total_without_usd_show)
+            .text = formArrayParser.calculateTotal(true)
+        totalView.findViewById<TextView>(R.id.total_show)
+            .text = formArrayParser.calculateTotal(false)
+        totalView.setPadding(100, 0, 0, 0)
+        return totalView
     }
 
     private fun insertDialog(parentId: Int) {

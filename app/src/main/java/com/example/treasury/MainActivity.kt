@@ -74,10 +74,16 @@ class MainActivity : AppCompatActivity() {
 
         // set observer for current data
         mainViewModel.currentData.observe(this, {
+            for (form in it) println(form)
             formArrayParser = FormArrayParser(it.toCollection(arrayListOf()))
-            val rootLayout = findViewById<LinearLayout>(R.id.page)
-            rootLayout.removeAllViews()
-            renderForm(-1, rootLayout)
+            val pageLayout = findViewById<LinearLayout>(R.id.page)
+            val totalLayout = findViewById<LinearLayout>(R.id.total)
+            pageLayout.removeAllViews()
+            totalLayout.removeAllViews()
+            renderForm(-1, pageLayout)
+            if (it.isNotEmpty()) {
+                totalLayout.addView(totalShow(totalLayout))
+            }
         })
 
         // set observer for current data
@@ -156,5 +162,17 @@ class MainActivity : AppCompatActivity() {
         dateView.findViewById<TextView>(R.id.day_show)
             .text = date.day
         return dateView
+    }
+
+    private fun totalShow(root: ViewGroup?): View{
+        val totalView = LayoutInflater
+            .from(this)
+            .inflate(R.layout.total_show, root, false)
+        totalView.findViewById<TextView>(R.id.total_without_usd_show)
+            .text = formArrayParser.calculateTotal(true)
+        totalView.findViewById<TextView>(R.id.total_show)
+            .text = formArrayParser.calculateTotal(false)
+        totalView.setPadding(100, 0, 0, 0)
+        return totalView
     }
 }

@@ -205,6 +205,22 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
     }
 
     /*
+     * Calculate total value ( without usd ).
+     */
+    fun calculateTotal(withoutUSD: Boolean): String{
+        var sum = BigDecimal.ZERO
+        if (childrenMap[-1] != null) {
+            for (form in childrenMap[-1]!!) {
+                if (withoutUSD && form.type == Form.type_USD) {
+                    continue
+                }
+                sum += form.valueDecimal()
+            }
+        }
+        return sum.toString()
+    }
+
+    /*
      * Export Data as an ArrayList
      */
     fun exportData(): ArrayList<Form>{
