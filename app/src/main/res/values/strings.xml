@@ -13,8 +13,8 @@
     <string name="day">日</string>
     <string name="year_AD">西元年</string>
     <string name="usd_ex_rate">美金匯率：</string>
-    <string name="total_without_usd">不含美股總值：</string>
-    <string name="total">含美股總值：</string>
+    <string name="total_without_usd">六、不含美股總值：</string>
+    <string name="total">七、含美股總值：</string>
 
     <string-array name="month_array">
         <item>1</item>
