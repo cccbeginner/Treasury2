@@ -16,7 +16,7 @@ class AuthActivity : AppCompatActivity() {
         setContentView(R.layout.activity_auth)
 
         val user = getSharedPreferences("user", MODE_PRIVATE)
-        val password = user.getString("password", null)
+        var password = user.getString("password", null)
         if (password == null){
             setPasswordDialog()
         }
@@ -28,7 +28,7 @@ class AuthActivity : AppCompatActivity() {
                 if (success){
                     finish()
                 }else{
-                    Toast.makeText(this, "密碼錯誤", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "密碼錯誤", Toast.LENGTH_LONG).show()
                 }
             }
     }
@@ -39,9 +39,13 @@ class AuthActivity : AppCompatActivity() {
         builder.setTitle("設定密碼")
         builder.setPositiveButton("確定") { _, _ ->
             val title = editText.text.toString()
-            setPassword(title)
+            if (title.replace("\\s+".toRegex(), "") != "") {
+                setPassword(title)
+            }else{
+                Toast.makeText(this, "密碼不能為空", Toast.LENGTH_LONG).show()
+                setPasswordDialog()
+            }
         }
-        builder.setNegativeButton("取消") { _, _ ->}
         builder.create().show()
     }
     private fun sha256(input: String): String{
