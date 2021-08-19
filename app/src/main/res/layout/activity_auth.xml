@@ -30,8 +30,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:textSize="40sp"
-            android:inputType="textPassword"
-            android:text="asdf"/>
+            android:inputType="textPassword"/>
         <Button
             android:id="@+id/verify_button"
             android:layout_width="match_parent"

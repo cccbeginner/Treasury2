@@ -21,20 +21,19 @@ abstract class DateDatabase : RoomDatabase(){
                 instance = Room.databaseBuilder(context, DateDatabase::class.java, databaseName)
                     .addMigrations(migration_3_1)
                     .build()
-
             }
             return instance!!
         }
         val migration_3_1 = object : Migration(3, 1){
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE tbl_date RENAME TO tbl_date_old")
-                database.execSQL("CREATE TABLE tbl_date (" +
+                //database.execSQL("ALTER TABLE tbl_date RENAME TO tbl_date_old")
+                database.execSQL("CREATE TABLE IF NOT EXISTS tbl_date (" +
                         "year_month INTEGER PRIMARY KEY NOT NULL," +
                         "year TEXT NOT NULL," +
                         "month TEXT NOT NULL," +
                         "day TEXT NOT NULL)")
-                database.execSQL("INSERT INTO tbl_date SELECT * FROM tbl_date_old")
-                database.execSQL("DROP TABLE tbl_date_old")
+                //database.execSQL("INSERT INTO tbl_date SELECT * FROM tbl_date_old")
+                //database.execSQL("DROP TABLE IF EXISTS tbl_date_old")
             }
         }
     }
