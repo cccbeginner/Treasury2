@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
+import com.example.treasury.auth.AuthActivity
 import com.example.treasury.date.Date
 import com.example.treasury.edit.EditActivity
 import com.example.treasury.form.Form
@@ -21,6 +22,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // go to auth first hahaha
+        val authIntent = Intent(this, AuthActivity::class.java)
+        startActivity(authIntent)
 
         // viewModel
         val formRepository = (application as MyApplication).formRepository
@@ -99,9 +104,9 @@ class MainActivity : AppCompatActivity() {
         // button to go to edit page
         val goEdit = findViewById<Button>(R.id.go_edit_button)
         goEdit.setOnClickListener{
-            val intent = Intent(this, EditActivity::class.java)
-            intent.putExtra("yearMonth", mainViewModel.currentYearMonth)
-            startActivity(intent)
+            val editIntent = Intent(this, EditActivity::class.java)
+            editIntent.putExtra("yearMonth", mainViewModel.currentYearMonth)
+            startActivity(editIntent)
         }
     }
 

@@ -15,6 +15,8 @@
     <string name="usd_ex_rate">美金匯率：</string>
     <string name="total_without_usd">六、不含美股總值：</string>
     <string name="total">七、含美股總值：</string>
+    <string name="enterPassword">輸入密碼</string>
+    <string name="verify">確認</string>
 
     <string-array name="month_array">
         <item>1</item>
