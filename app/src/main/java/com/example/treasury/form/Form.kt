@@ -22,9 +22,13 @@ data class Form(
     var name: String,
     var value: String,
     var note: String,
+    @ColumnInfo(name = "can_be_a_list")
+    val canBeAList: Boolean,
+    @ColumnInfo(name = "can_be_modify")
+    val canBeModify: Boolean,
 ) {
-    constructor(id: Int, parentId: Int, yearMonth: Int, type: Int, name: String)
-        : this(id, parentId, yearMonth, type, "1", name, "", ""){
+    constructor(id: Int, parentId: Int, yearMonth: Int, type: Int, name: String, canAddItem: Boolean, canModify: Boolean)
+        : this(id, parentId, yearMonth, type, "1", name, "", "", canAddItem, canModify){
             if (type == type_USD){
                 weight = ""
             }

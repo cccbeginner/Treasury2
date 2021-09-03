@@ -171,21 +171,26 @@ class EditActivity : AppCompatActivity() {
             }
         })
         val deleteButton = formView.findViewById<ImageButton>(R.id.delete_button)
-        if (form.parentId == -1){
-            deleteButton.visibility = View.GONE
-        }else {
+        val addButton = formView.findViewById<Button>(R.id.add_button)
+        val updateNameButton = formView.findViewById<Button>(R.id.update_name_button)
+        if (form.canBeModify){
             deleteButton.setOnClickListener {
                 deleteDialog(form.id, !haveChild)
             }
-        }
-        formView.findViewById<Button>(R.id.add_button)
-            .setOnClickListener {
-                insertDialog(form.id)
-            }
-        formView.findViewById<Button>(R.id.update_name_button)
-            .setOnClickListener {
+            updateNameButton.setOnClickListener {
                 updateNameDialog(form.id, form.name)
             }
+        }else {
+            deleteButton.visibility = View.GONE
+            updateNameButton.visibility = View.GONE
+        }
+        if (form.canBeAList) {
+            addButton.setOnClickListener {
+                insertDialog(form.id)
+            }
+        }else{
+            addButton.visibility = View.GONE
+        }
         return formView
     }
 
@@ -231,9 +236,11 @@ class EditActivity : AppCompatActivity() {
         })
         if (cursorFormId == 0){
             lateinit var edit : EditText
-            if(cursorPlace == 1)edit = yearEdit
-            else if(cursorPlace == 2)edit = monthEdit
-            else if(cursorPlace == 3)edit = dayEdit
+            when (cursorPlace) {
+                1 -> edit = yearEdit
+                2 -> edit = monthEdit
+                3 -> edit = dayEdit
+            }
             edit.isFocusable = true
             edit.isFocusableInTouchMode = true
             edit.requestFocus()
@@ -265,7 +272,7 @@ class EditActivity : AppCompatActivity() {
         builder.setPositiveButton("確定") { _, _ ->
             val title = editText.text.toString().replace("\\s+".toRegex(), " ")
             if (title != "" && title != " "){
-                val newForm = Form(editViewModel.assignId(), parentId, currentYearMonth, Form.type_normal, title)
+                val newForm = Form(editViewModel.assignId(), parentId, currentYearMonth, Form.type_normal, title, false, true)
                 editViewModel.insertForm(newForm)
             }
         }

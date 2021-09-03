@@ -19,7 +19,7 @@ abstract class FormDatabase : RoomDatabase(){
             instance ?: synchronized(FormDatabase::class){
                 instance = Room.databaseBuilder(context, FormDatabase::class.java, databaseName)
                     .addMigrations(migration_1_2)
-                    .addMigrations(migration_2_3)
+                    .addMigrations(migration_1_3)
                     .build()
 
             }
@@ -43,7 +43,7 @@ abstract class FormDatabase : RoomDatabase(){
                 database.execSQL("DROP TABLE tbl_form_old")
             }
         }
-        private val migration_2_3 : Migration = object : Migration(1, 3){
+        /*private val migration_2_3 : Migration = object : Migration(1, 3){
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("ALTER TABLE tbl_form RENAME TO tbl_form_old")
                 database.execSQL("CREATE TABLE tbl_form (" +
@@ -59,6 +59,27 @@ abstract class FormDatabase : RoomDatabase(){
                 database.execSQL("CREATE UNIQUE INDEX index_tbl_form_parent_id_year_month_name \n" +
                         "ON tbl_form(parent_id, year_month, name);")
                 database.execSQL("INSERT INTO tbl_form SELECT * FROM tbl_form_old")
+                database.execSQL("DROP TABLE tbl_form_old")
+            }
+        }*/
+        private val migration_1_3 : Migration = object : Migration(1, 3){
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE tbl_form RENAME TO tbl_form_old")
+                database.execSQL("CREATE TABLE tbl_form (" +
+                        "_id INTEGER PRIMARY KEY NOT NULL," +
+                        "parent_id INTEGER NOT NULL," +
+                        "year_month INTEGER NOT NULL," +
+                        "type INTEGER NOT NULL," +
+                        "weight TEXT NOT NULL," +
+                        "name TEXT NOT NULL," +
+                        "value TEXT NOT NULL," +
+                        "note TEXT NOT NULL," +
+                        "can_be_a_list INTEGER NOT NULL," +
+                        "can_be_modify INTEGER NOT NULL)")
+                database.execSQL("DROP INDEX IF EXISTS index_tbl_form_parent_id_year_month_name")
+                database.execSQL("CREATE UNIQUE INDEX index_tbl_form_parent_id_year_month_name \n" +
+                        "ON tbl_form(parent_id, year_month, name);")
+                //database.execSQL("INSERT INTO tbl_form SELECT * FROM tbl_form_old")
                 database.execSQL("DROP TABLE tbl_form_old")
             }
         }

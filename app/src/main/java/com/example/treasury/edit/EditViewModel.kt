@@ -16,7 +16,7 @@ class EditViewModel(
     private var originalData : LiveData<Array<Form>> = formRepository.formListFlow.asLiveData()
     private var preMonthData : LiveData<Array<Form>> = formRepository.formListFlowExtra.asLiveData()
     private var formArrayParser = FormArrayParser(arrayListOf())
-    var originalDate : LiveData<Date> = dateRepository.dateFlow.asLiveData()
+    private var originalDate : LiveData<Date> = dateRepository.dateFlow.asLiveData()
     var currentData = MutableLiveData<ArrayList<Form>>()
     var currentDate = MutableLiveData<Date>()
     private var alreadyHaveData = false
@@ -71,17 +71,17 @@ class EditViewModel(
 
     private fun initFormArray(): ArrayList<Form>{
         val ret = ArrayList<Form>()
-        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "一、流動現金"))
-        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "二、投資帳現值"))
-        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "三、貸款餘額"))
-        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "四、扣除"))
-        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_USD, "五、美股"))
-        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_normal, "a. 活存"))
-        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_normal, "b. 現金"))
-        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_USD, "c. 外幣"))
-        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "a. 證券"))
-        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "b. 基金"))
-        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "c. 黃金"))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "一、流動現金", false, false))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "二、投資帳現值", false, false))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "三、貸款餘額" ,true, false))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_normal, "四、扣除",true, false))
+        ret.add(Form(assignId(), -1, currentYearMonth, Form.type_USD, "五、美股",true, false))
+        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_normal, "a. 活存",true, false))
+        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_normal, "b. 現金", false, false))
+        ret.add(Form(assignId(), ret[0].id, currentYearMonth, Form.type_USD, "c. 外幣",true, false))
+        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "a. 證券",true, false))
+        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "b. 基金",true, false))
+        ret.add(Form(assignId(), ret[1].id, currentYearMonth, Form.type_normal, "c. 黃金",true, false))
         return ret
     }
 

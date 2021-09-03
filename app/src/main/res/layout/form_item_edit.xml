@@ -44,6 +44,23 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add"
+            android:textColor="#999"
+            android:textSize="18sp"
+            android:backgroundTint="#fff"/>
+        <Button
+            android:id="@+id/update_name_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="@string/update_name"
+            android:textColor="#999"
+            android:textSize="18sp"
+            android:backgroundTint="#fff"/>
 
         <ImageButton
             android:id="@+id/delete_button"
@@ -67,28 +84,5 @@
             android:id="@+id/note_edit"
             android:layout_width="400dp"
             android:layout_height="wrap_content"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/add_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/add"
-            android:textColor="#999"
-            android:textSize="18sp"
-            android:backgroundTint="#fff"/>
-        <Button
-            android:id="@+id/update_name_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:text="@string/update_name"
-            android:textColor="#999"
-            android:textSize="18sp"
-            android:backgroundTint="#fff"/>
     </LinearLayout>
 </LinearLayout>
