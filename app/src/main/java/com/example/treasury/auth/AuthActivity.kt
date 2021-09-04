@@ -11,20 +11,21 @@ import java.math.BigInteger
 import java.security.MessageDigest
 
 class AuthActivity : AppCompatActivity() {
+
+    private val passwordProcessor = PasswordProcessor(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth)
 
-        val user = getSharedPreferences("user", MODE_PRIVATE)
-        var password = user.getString("password", null)
-        if (password == null){
+        if (!passwordProcessor.havePassword()){
             setPasswordDialog()
         }
 
         findViewById<Button>(R.id.verify_button)
             .setOnClickListener {
                 val input = findViewById<EditText>(R.id.password_edit).text.toString()
-                val success = verifyPassword(input)
+                val success = passwordProcessor.verifyPassword(input)
                 if (success){
                     finish()
                 }else{
@@ -40,31 +41,12 @@ class AuthActivity : AppCompatActivity() {
         builder.setPositiveButton("確定") { _, _ ->
             val title = editText.text.toString()
             if (title.replace("\\s+".toRegex(), "") != "") {
-                setPassword(title)
+                passwordProcessor.setPassword(title)
             }else{
                 Toast.makeText(this, "密碼不能為空", Toast.LENGTH_LONG).show()
                 setPasswordDialog()
             }
         }
         builder.create().show()
-    }
-    private fun sha256(input: String): String{
-        val digest: MessageDigest = MessageDigest.getInstance("SHA-256")
-        digest.reset()
-        digest.update(input.toByteArray())
-        return java.lang.String.format("%064x", BigInteger(1, digest.digest()))
-    }
-    private fun setPassword(password: String){
-        val hash = sha256(password)
-        val user = getSharedPreferences("user", MODE_PRIVATE)
-        user.edit().putString("password", hash).apply()
-    }
-    private fun verifyPassword(password: String): Boolean{
-        val hash = sha256(password)
-        val user = getSharedPreferences("user", MODE_PRIVATE)
-        val currentHash = user.getString("password", null)
-        println(hash)
-        println(currentHash)
-        return hash == currentHash
     }
 }

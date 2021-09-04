@@ -17,6 +17,9 @@
     <string name="total">七、含美股總值：</string>
     <string name="enterPassword">輸入密碼</string>
     <string name="verify">確認</string>
+    <string name="update_password">更改密碼</string>
+    <string name="enterNewPassword">輸入新密碼</string>
+    <string name="enterOriginalPassword">輸入原密碼</string>
 
     <string-array name="month_array">
         <item>1</item>

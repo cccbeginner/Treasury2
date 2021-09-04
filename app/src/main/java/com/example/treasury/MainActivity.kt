@@ -4,12 +4,11 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.treasury.auth.AuthActivity
+import com.example.treasury.auth.UpdatePasswordActivity
 import com.example.treasury.date.Date
 import com.example.treasury.edit.EditActivity
 import com.example.treasury.form.Form
@@ -107,6 +106,22 @@ class MainActivity : AppCompatActivity() {
             val editIntent = Intent(this, EditActivity::class.java)
             editIntent.putExtra("yearMonth", mainViewModel.currentYearMonth)
             startActivity(editIntent)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.update_password -> {
+                val updatePasswordIntent = Intent(this, UpdatePasswordActivity::class.java)
+                startActivity(updatePasswordIntent)
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 

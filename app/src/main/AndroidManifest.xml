@@ -9,6 +9,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Treasury">
+        <activity android:name=".auth.UpdatePasswordActivity"></activity>
         <activity android:name=".auth.AuthActivity" />
         <activity android:name=".edit.EditActivity" />
         <activity android:name=".MainActivity">
