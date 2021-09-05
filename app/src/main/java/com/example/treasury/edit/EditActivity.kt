@@ -70,10 +70,6 @@ class EditActivity : AppCompatActivity() {
             }
     }
 
-    var cursor = -1
-    var cursorPlace = -1 // 1 -> value, 2 -> weight ,, 1 -> year, 2 -> month, 3 -> day
-    var cursorFormId = -1 // 0 -> date, >1 -> form
-
     @SuppressLint("SetTextI18n")
     private fun renderForm(formId: Int, currentLayout: LinearLayout){
         val theForm = formArrayParser.getTheForm(formId)
@@ -120,20 +116,8 @@ class EditActivity : AppCompatActivity() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
                     editViewModel.updateFormValue(form.id, s.toString())
-                    cursor = numberEdit.selectionEnd
-                    cursorPlace = 1
-                    cursorFormId = form.id
                 }
             })
-            if (form.id == cursorFormId && cursorPlace == 1){ //reset cursor
-                numberEdit.isFocusable = true
-                numberEdit.isFocusableInTouchMode = true
-                numberEdit.requestFocus()
-                numberEdit.setSelection(min(cursor, form.value.length))
-                cursor = -1
-                cursorPlace = -1
-                cursorFormId = -1
-            }
         }
         if(form.type == Form.type_USD){
             val usdEdit = formView.findViewById<EditText>(R.id.usd_number_edit)
@@ -143,20 +127,8 @@ class EditActivity : AppCompatActivity() {
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
                     editViewModel.updateFormWeight(form.id, s.toString())
-                    cursor = usdEdit.selectionEnd
-                    cursorPlace = 2
-                    cursorFormId = form.id
                 }
             })
-            if (form.id == cursorFormId && cursorPlace == 2){ //reset cursor
-                usdEdit.isFocusable = true
-                usdEdit.isFocusableInTouchMode = true
-                usdEdit.requestFocus()
-                usdEdit.setSelection(cursor)
-                cursor = -1
-                cursorPlace = -1
-                cursorFormId = -1
-            }
         }else{
             formView.findViewById<LinearLayout>(R.id.usd)
                 .visibility = View.GONE
@@ -209,9 +181,6 @@ class EditActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 editViewModel.updateDateYear(s.toString())
-                cursor = yearEdit.selectionEnd
-                cursorPlace = 1
-                cursorFormId = 0
             }
         })
         monthEdit.addTextChangedListener(object : TextWatcher{
@@ -219,9 +188,6 @@ class EditActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 editViewModel.updateDateMonth(s.toString())
-                cursor = monthEdit.selectionEnd
-                cursorPlace = 2
-                cursorFormId = 0
             }
         })
         dayEdit.addTextChangedListener(object : TextWatcher{
@@ -229,26 +195,8 @@ class EditActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
                 editViewModel.updateDateDay(s.toString())
-                cursor = dayEdit.selectionEnd
-                cursorPlace = 3
-                cursorFormId = 0
             }
         })
-        if (cursorFormId == 0){
-            lateinit var edit : EditText
-            when (cursorPlace) {
-                1 -> edit = yearEdit
-                2 -> edit = monthEdit
-                3 -> edit = dayEdit
-            }
-            edit.isFocusable = true
-            edit.isFocusableInTouchMode = true
-            edit.requestFocus()
-            edit.setSelection(cursor)
-            cursor = -1
-            cursorPlace = -1
-            cursorFormId = -1
-        }
         return dateView
     }
 
