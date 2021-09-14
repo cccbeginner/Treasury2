@@ -16,7 +16,6 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
         for (form in initialFormArray){
             insert(form)
         }
-        recalculate()
     }
 
     /*
@@ -37,12 +36,17 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
      * recalculate all these form values
      * (by updateValues from all leaves)
      */
-    private fun recalculate(){
-        for (kv in idMap){
-            if(childrenMap[kv.key] == null){
-                val form = kv.value
-                updateValue(form.id, form.value)
+    private fun recalculate(id: Int){
+        println("recalculate $id")
+        if (childrenMap[id] != null){
+            var sum = BigDecimal.ZERO
+            for (form in childrenMap[id]!!){
+                sum += form.valueDecimal()
             }
+            sum *= idMap[id]!!.weightDecimal()
+            updateValue(id, sum.toString())
+        }else{
+            updateValue(id, "")
         }
     }
 
@@ -147,7 +151,7 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
                     break
                 }
             }
-            updateValue(id, it.value)
+            recalculate(id)
         }
     }
 

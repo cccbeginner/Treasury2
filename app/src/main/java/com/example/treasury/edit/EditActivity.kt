@@ -309,7 +309,7 @@ class EditActivity : AppCompatActivity() {
     private fun updateFormWeight(id: Int, weight: String){
         formArrayParser.updateWeight(id, weight)
         val form = formArrayParser.getTheForm(id)!!
-        updateFormValue(form.parentId, null)
+        updateFormValue(form.id, null)
     }
     private fun updateFormName(id: Int, name: String){
         formArrayParser.updateName(id, name)
