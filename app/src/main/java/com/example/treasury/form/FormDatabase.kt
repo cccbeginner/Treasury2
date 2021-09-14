@@ -79,7 +79,7 @@ abstract class FormDatabase : RoomDatabase(){
                 database.execSQL("DROP INDEX IF EXISTS index_tbl_form_parent_id_year_month_name")
                 database.execSQL("CREATE UNIQUE INDEX index_tbl_form_parent_id_year_month_name \n" +
                         "ON tbl_form(parent_id, year_month, name);")
-                //database.execSQL("INSERT INTO tbl_form SELECT * FROM tbl_form_old")
+                database.execSQL("INSERT INTO tbl_form SELECT * FROM tbl_form_old")
                 database.execSQL("DROP TABLE tbl_form_old")
             }
         }
