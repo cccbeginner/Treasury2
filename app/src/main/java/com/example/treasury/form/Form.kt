@@ -27,12 +27,8 @@ data class Form(
     @ColumnInfo(name = "can_be_modify")
     val canBeModify: Boolean,
 ) {
-    constructor(id: Int, parentId: Int, yearMonth: Int, type: Int, name: String, canAddItem: Boolean, canModify: Boolean)
-        : this(id, parentId, yearMonth, type, "1", name, "", "", canAddItem, canModify){
-            if (type == type_USD){
-                weight = ""
-            }
-        }
+    constructor(id: Int, parentId: Int, yearMonth: Int, type: Int, weight: String, name: String, canAddItem: Boolean, canModify: Boolean)
+        : this(id, parentId, yearMonth, type, weight, name, "", "", canAddItem, canModify)
 
     fun valueDecimal(): BigDecimal{
         if(value == "")return BigDecimal.ZERO

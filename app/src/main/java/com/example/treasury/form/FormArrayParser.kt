@@ -49,7 +49,7 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
     /*
      * Check if no conflict before insert & update
      */
-    fun noConflict(form: Form): Boolean{
+    private fun noConflict(form: Form): Boolean{
         childrenMap[form.parentId]?.let {
             for (theForm in childrenMap[form.parentId]!!){
                 if (form.name == theForm.name && form.id != theForm.id){
@@ -60,7 +60,7 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
         return true
     }
 
-    fun stringToDecimal(string: String): BigDecimal{
+    private fun stringToDecimal(string: String): BigDecimal{
         if (string == "")return BigDecimal.ZERO
         else return BigDecimal(string)
     }
@@ -84,7 +84,7 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
      */
     fun updateValue(id : Int, value : String){
         idMap[id]?.let{
-            it.value = (stringToDecimal(value) * it.weightDecimal()).toString()
+            it.value = value
             val formList = childrenMap[it.parentId]
             var sum = BigDecimal.ZERO
             if (formList != null) {
@@ -93,6 +93,10 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
                         sum += form.valueDecimal()
                     }
                 }
+            }
+            val parent = idMap[it.parentId]
+            if (parent != null){
+                sum *= parent.weightDecimal()
             }
             updateValue(it.parentId, sum.toString())
         }
@@ -214,7 +218,11 @@ class FormArrayParser (initialFormArray: ArrayList<Form>) {
                 if (withoutUSD && form.type == Form.type_USD) {
                     continue
                 }
-                sum += form.valueDecimal()
+                if (form.name == "三、貸款餘額" || form.name == "四、扣除"){
+                    sum -= form.valueDecimal()
+                }else{
+                    sum += form.valueDecimal()
+                }
             }
         }
         return sum.toString()

@@ -2,7 +2,6 @@ package com.example.treasury.edit
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.treasury.MyApplication
 import com.example.treasury.R
@@ -18,7 +18,6 @@ import com.example.treasury.date.DateRepository
 import com.example.treasury.form.Form
 import com.example.treasury.form.FormArrayParser
 import com.example.treasury.form.FormRepository
-import java.lang.Math.min
 
 class EditActivity : AppCompatActivity() {
 
@@ -26,11 +25,23 @@ class EditActivity : AppCompatActivity() {
     private lateinit var formRepository: FormRepository
     private lateinit var dateRepository: DateRepository
     private lateinit var editViewModel: EditViewModel
+
+    private lateinit var currentDate: Date
     private var formArrayParser = FormArrayParser(arrayListOf())
+    private lateinit var pageLayout: LinearLayout
+    private lateinit var totalLayout: LinearLayout
+
+    // < form id, view >
+    private var formViewMap = mutableMapOf<Int, View>()
+    private var formLayoutMap = mutableMapOf<Int, LinearLayout>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit)
+
+        // main layouts
+        pageLayout = findViewById(R.id.page)
+        totalLayout = findViewById(R.id.total)
 
         // viewModel
         currentYearMonth = intent.getIntExtra("yearMonth", -1)
@@ -40,19 +51,17 @@ class EditActivity : AppCompatActivity() {
         editViewModel = ViewModelProvider(this, EditViewModelFactory(formRepository, dateRepository, currentYearMonth))
             .get(EditViewModel::class.java)
 
-        editViewModel.currentData.observe(this, {
+        editViewModel.originalData.observe(this, {
             formArrayParser = FormArrayParser(it)
-            val pageLayout = findViewById<LinearLayout>(R.id.page)
-            val totalLayout = findViewById<LinearLayout>(R.id.total)
             pageLayout.removeAllViews()
-            totalLayout.removeAllViews()
             renderForm(-1, pageLayout)
-            if (it.isNotEmpty()) {
-                totalLayout.addView(totalShow(totalLayout))
-            }
+
+            totalLayout.removeAllViews()
+            totalLayout.addView(totalShow(totalLayout))
         })
 
-        editViewModel.currentDate.observe(this, {
+        editViewModel.originalDate.observe(this, {
+            currentDate = it
             val rootLayout = findViewById<LinearLayout>(R.id.date)
             rootLayout.removeAllViews()
             rootLayout.setPadding(100, 10, 0, 0)
@@ -61,7 +70,7 @@ class EditActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.save_button)
             .setOnClickListener {
-                editViewModel.saveData()
+                editViewModel.saveData(currentDate, formArrayParser.exportData())
                 finish()
             }
         findViewById<Button>(R.id.cancel_button)
@@ -72,10 +81,20 @@ class EditActivity : AppCompatActivity() {
 
     @SuppressLint("SetTextI18n")
     private fun renderForm(formId: Int, currentLayout: LinearLayout){
+
         val theForm = formArrayParser.getTheForm(formId)
         val childrenArray = formArrayParser.getChildren(formId)
+        formLayoutMap[formId] = currentLayout
 
         theForm?.let {
+            val parentLayout = formLayoutMap[theForm.parentId]!!
+            currentLayout.layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT)
+            currentLayout.orientation = LinearLayout.VERTICAL
+            currentLayout.setPadding(100, 10, 0, 0)
+            parentLayout.addView(currentLayout)
+
             if (childrenArray.isNotEmpty()) {
                 val formView = formEdit(it, currentLayout, true)
                 currentLayout.addView(formView)
@@ -87,12 +106,6 @@ class EditActivity : AppCompatActivity() {
 
         for (child in childrenArray){
             val childLayout = LinearLayout(this)
-            childLayout.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT)
-            childLayout.orientation = LinearLayout.VERTICAL
-            childLayout.setPadding(100, 10, 0, 0)
-            currentLayout.addView(childLayout)
             renderForm(child.id, childLayout)
         }
     }
@@ -101,23 +114,24 @@ class EditActivity : AppCompatActivity() {
         val formView = LayoutInflater
             .from(this)
             .inflate(R.layout.form_item_edit, root, false)
+        formViewMap[form.id] = formView
         formView.findViewById<TextView>(R.id.title_show)
             .text = "${form.name}："
         val numberShow = formView.findViewById<TextView>(R.id.number_show)
         val numberEdit = formView.findViewById<EditText>(R.id.number_edit)
+        numberEdit.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                updateFormValue(form.id, s.toString())
+            }
+        })
         if (haveChild){
             numberEdit.visibility = View.GONE
             numberShow.text = form.value
         }else{
             numberShow.visibility = View.GONE
             numberEdit.setText(form.value)
-            numberEdit.addTextChangedListener(object : TextWatcher{
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-                override fun afterTextChanged(s: Editable?) {
-                    editViewModel.updateFormValue(form.id, s.toString())
-                }
-            })
         }
         if(form.type == Form.type_USD){
             val usdEdit = formView.findViewById<EditText>(R.id.usd_number_edit)
@@ -126,7 +140,7 @@ class EditActivity : AppCompatActivity() {
                 override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
-                    editViewModel.updateFormWeight(form.id, s.toString())
+                    updateFormWeight(form.id, s.toString())
                 }
             })
         }else{
@@ -139,7 +153,7 @@ class EditActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                editViewModel.updateFormNote(form.id, s.toString())
+                updateFormNote(form.id, s.toString())
             }
         })
         val deleteButton = formView.findViewById<ImageButton>(R.id.delete_button)
@@ -163,6 +177,7 @@ class EditActivity : AppCompatActivity() {
         }else{
             addButton.visibility = View.GONE
         }
+
         return formView
     }
 
@@ -180,21 +195,21 @@ class EditActivity : AppCompatActivity() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                editViewModel.updateDateYear(s.toString())
+                currentDate.year = s.toString()
             }
         })
         monthEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                editViewModel.updateDateMonth(s.toString())
+                currentDate.month = s.toString()
             }
         })
         dayEdit.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
             override fun afterTextChanged(s: Editable?) {
-                editViewModel.updateDateDay(s.toString())
+                currentDate.day = s.toString()
             }
         })
         return dateView
@@ -220,8 +235,8 @@ class EditActivity : AppCompatActivity() {
         builder.setPositiveButton("確定") { _, _ ->
             val title = editText.text.toString().replace("\\s+".toRegex(), " ")
             if (title != "" && title != " "){
-                val newForm = Form(editViewModel.assignId(), parentId, currentYearMonth, Form.type_normal, title, false, true)
-                editViewModel.insertForm(newForm)
+                val newForm = Form(editViewModel.assignId(), parentId, currentYearMonth, Form.type_normal, "1", title, false, true)
+                insertForm(newForm)
             }
         }
         builder.setNegativeButton("取消") { _, _ ->}
@@ -236,7 +251,7 @@ class EditActivity : AppCompatActivity() {
         builder.setPositiveButton("確定") { _, _ ->
             val title = editText.text.toString().replace("\\s+".toRegex(), " ")
             if (title != "" && title != " "){
-                editViewModel.updateFormName(id, title)
+                updateFormName(id, title)
             }
         }
         builder.setNegativeButton("取消") { _, _ ->}
@@ -250,9 +265,70 @@ class EditActivity : AppCompatActivity() {
             builder.setTitle("確認刪除？將會連同其底下包含的資料一起刪除。")
         }
         builder.setPositiveButton("確定") { _, _ ->
-          editViewModel.deleteForm(id)
+          deleteForm(id)
         }
         builder.setNegativeButton("取消") { _, _ ->}
         builder.create().show()
     }
+
+    /************************* Modify Data Area **************************/
+
+    private fun insertForm(form: Form){
+        formArrayParser.insert(form)
+        val layout = LinearLayout(this)
+        renderForm(form.id, layout)
+        updateFormValue(form.parentId, null)
+    }
+
+    // value is null if I don't wanna change value
+    private fun updateFormValue(id: Int, value: String?){
+        if (id == -1){
+            totalLayout.removeAllViews()
+            totalLayout.addView(totalShow(totalLayout))
+            return
+        }
+        value?.let {
+            formArrayParser.updateValue(id, value)
+        }
+        val form = formArrayParser.getTheForm(id)!!
+        val haveChild = formArrayParser.getChildren(id).isNotEmpty()
+        val formView = formViewMap[id]!!
+
+        val numberShow = formView.findViewById<TextView>(R.id.number_show)
+        val numberEdit = formView.findViewById<EditText>(R.id.number_edit)
+        if (haveChild){
+            numberEdit.visibility = View.GONE
+            numberShow.visibility = View.VISIBLE
+            numberShow.text = form.value
+        }else{
+            numberShow.visibility = View.GONE
+            numberEdit.visibility = View.VISIBLE
+        }
+        updateFormValue(form.parentId, null)
+    }
+    private fun updateFormWeight(id: Int, weight: String){
+        formArrayParser.updateWeight(id, weight)
+        val form = formArrayParser.getTheForm(id)!!
+        updateFormValue(form.parentId, null)
+    }
+    private fun updateFormName(id: Int, name: String){
+        formArrayParser.updateName(id, name)
+        val form = formArrayParser.getTheForm(id)!!
+        val formView = formViewMap[id]!!
+        val titleShow = formView.findViewById<TextView>(R.id.title_show)
+        titleShow.text = form.name+"："
+    }
+    private fun updateFormNote(id: Int, note: String){
+        formArrayParser.updateNote(id, note)
+    }
+    private fun deleteForm(id: Int){
+        val form = formArrayParser.getTheForm(id)!!
+        val layout = formLayoutMap[id]!!
+        (layout.parent as ViewGroup).removeView(layout)
+        formArrayParser.delete(id)
+        formViewMap.remove(id)
+        formLayoutMap.remove(id)
+        updateFormValue(form.parentId, null)
+    }
+    /*********************************************************************/
 }
