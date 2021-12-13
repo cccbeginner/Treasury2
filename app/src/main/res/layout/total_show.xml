@@ -17,7 +17,7 @@
             android:id="@+id/total_without_usd_show"
             android:maxLines="1"
             android:textSize="22sp"
-            android:layout_width="150dp"
+            android:layout_width="@dimen/number_width"
             android:layout_height="wrap_content"/>
     </LinearLayout>
     <LinearLayout
@@ -35,7 +35,7 @@
             android:id="@+id/total_show"
             android:maxLines="1"
             android:textSize="22sp"
-            android:layout_width="150dp"
+            android:layout_width="@dimen/number_width"
             android:layout_height="wrap_content"/>
     </LinearLayout>
 </LinearLayout>

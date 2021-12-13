@@ -20,7 +20,7 @@
             android:id="@+id/number_show"
             android:maxLines="1"
             android:textSize="22sp"
-            android:layout_width="150dp"
+            android:layout_width="@dimen/number_width"
             android:layout_height="wrap_content"/>
 
         <LinearLayout
