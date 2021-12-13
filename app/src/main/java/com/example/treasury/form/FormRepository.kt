@@ -27,7 +27,7 @@ class FormRepository (private val formDao: FormDao) {
         if(num == null){
             idMax = 0
         }else{
-            idMax = 1
+            idMax = num
         }
     }
 
