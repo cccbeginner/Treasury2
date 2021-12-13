@@ -18,11 +18,11 @@ class FormRepository (private val formDao: FormDao) {
 
     init {
         GlobalScope.launch {
-            refrechIdMax()
+            refreshIdMax()
         }
     }
 
-    private suspend fun refrechIdMax(){
+    private suspend fun refreshIdMax(){
         val num = formDao.getMaxId()
         if(num == null){
             idMax = 0
@@ -42,7 +42,7 @@ class FormRepository (private val formDao: FormDao) {
 
     suspend fun insertMany(formArrayList: ArrayList<Form>){
         formDao.insertMany(formArrayList.toTypedArray())
-        refrechIdMax()
+        refreshIdMax()
     }
 
     suspend fun deleteByCurrentYearMonth(yearMonth: Int){
